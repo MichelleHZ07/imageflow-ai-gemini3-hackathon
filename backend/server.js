@@ -216,8 +216,9 @@ app.get("/api/image-proxy", async (req, res) => {
 
 /* -----------------------------------------------------
    4b) HEIC → JPEG 转换 (iPhone 照片支持)
-   Strategy: sharp first → macOS sips fallback
+   Strategy: sharp → heic-convert → macOS sips fallback
    - sharp: fast, works if libvips has HEIC codec
+   - heic-convert: pure JS, works everywhere (Linux/Cloud Run)
    - sips: macOS built-in, always supports HEIC natively
 ----------------------------------------------------- */
 import { writeFile, readFile, unlink } from "fs/promises";
@@ -225,6 +226,8 @@ import { execFile } from "child_process";
 import { promisify } from "util";
 import { tmpdir } from "os";
 import { join } from "path";
+import convert from "heic-convert";
+
 const execFileAsync = promisify(execFile);
 
 const upload = multer({
@@ -235,6 +238,16 @@ const upload = multer({
 async function convertWithSharp(buffer) {
   const jpegBuffer = await sharp(buffer).jpeg({ quality: 92 }).toBuffer();
   return jpegBuffer;
+}
+
+async function convertWithHeicConvert(buffer) {
+  // Pure JavaScript HEIC decoder - works on all platforms including Linux/Cloud Run
+  const jpegBuffer = await convert({
+    buffer: buffer,
+    format: "JPEG",
+    quality: 0.92,
+  });
+  return Buffer.from(jpegBuffer);
 }
 
 async function convertWithSips(buffer, originalName) {
@@ -273,13 +286,21 @@ app.post("/api/convert-heic", upload.single("image"), async (req, res) => {
     } catch (sharpErr) {
       console.warn(`⚠️ [sharp] failed: ${sharpErr.message}`);
 
-      // Try 2: sips (macOS built-in, always supports HEIC)
+      // Try 2: heic-convert (pure JS, cross-platform - works on Cloud Run!)
       try {
-        jpegBuffer = await convertWithSips(req.file.buffer, req.file.originalname);
-        console.log(`✅ [sips] HEIC → JPEG: ${(jpegBuffer.length / 1024 / 1024).toFixed(1)}MB`);
-      } catch (sipsErr) {
-        console.error(`❌ [sips] also failed: ${sipsErr.message}`);
-        throw new Error("HEIC conversion failed with both sharp and sips");
+        jpegBuffer = await convertWithHeicConvert(req.file.buffer);
+        console.log(`✅ [heic-convert] HEIC → JPEG: ${(jpegBuffer.length / 1024 / 1024).toFixed(1)}MB`);
+      } catch (heicConvertErr) {
+        console.warn(`⚠️ [heic-convert] failed: ${heicConvertErr.message}`);
+
+        // Try 3: sips (macOS only fallback)
+        try {
+          jpegBuffer = await convertWithSips(req.file.buffer, req.file.originalname);
+          console.log(`✅ [sips] HEIC → JPEG: ${(jpegBuffer.length / 1024 / 1024).toFixed(1)}MB`);
+        } catch (sipsErr) {
+          console.error(`❌ [sips] also failed: ${sipsErr.message}`);
+          throw new Error("HEIC conversion failed with all methods (sharp, heic-convert, sips)");
+        }
       }
     }
 

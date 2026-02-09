@@ -17,6 +17,7 @@
     "express": "^4.19.2",
     "firebase-admin": "^13.5.0",
     "google-auth-library": "^10.4.0",
+    "heic-convert": "^2.1.0",
     "multer": "^2.0.2",
     "node-fetch": "^3.3.2",
     "sharp": "^0.34.5",

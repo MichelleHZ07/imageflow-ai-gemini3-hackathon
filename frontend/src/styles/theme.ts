@@ -11,14 +11,14 @@ export type Colors = {
 };
 
 const lightColors: Colors = {
-  bg: "#e3d7caff",      // page background
-  text: "#352c25ff",    // main text
-  accent: "#735948ff",  // emphasis/main button
-  card: "#F5F0EA",    // card background (fully opaque)
-  inner: "#e3d7caff",   // input area background
-  border: "#C8BBAF",  // border
-  white: "#F9F8F6",   // soft white
-  muted: "#6e5a4e99", // secondary text
+  bg: "#e6daccff",        // 夜间 text 反过来当背景
+  text: "#2f2119",      // 夜间 bg 反过来当文字
+  accent: "#6d5a4cff",    // 金色的深色版（日间要深才看得清）
+  card: "#F5EDE4",      // 奶油白卡片
+  inner: "#E0D3C4",     // 浅摩卡
+  border: "#C9B9A8",    // 暖米边框
+  white: "rgba(246, 245, 242, 1)",     // 纯白
+  muted: "#6A5244",     // 夜间 white 当次要文字
 };
 
 

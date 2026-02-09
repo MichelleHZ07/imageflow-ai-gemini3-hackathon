@@ -13,7 +13,7 @@
  * - Same output quality as full-resolution
  */
 
-import heic2any from "heic2any";
+// heic2any import removed - using server-side conversion for better performance
 
 interface ImageData {
   aiOptimized: string;   // 2048px base64 for AI (balanced quality + size)
@@ -81,21 +81,10 @@ async function ensureDecodable(file: File): Promise<File> {
   const sizeMB = (file.size / 1024 / 1024).toFixed(1);
   const newName = file.name.replace(/\.(heic|heif|png|jpg|jpeg)$/i, ".jpg");
 
-  // Try 1: Client-side conversion with heic2any
+  // Server-side conversion via /api/convert-heic (sharp with native HEIF support)
+  // Skip client-side heic2any - it's slow and often fails on modern HEIC files
   try {
-    console.log(`🔄 [client] Converting HEIC: ${file.name} (${sizeMB}MB)`);
-    const blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.92 });
-    const resultBlob = Array.isArray(blob) ? blob[0] : blob;
-    const converted = new File([resultBlob], newName, { type: "image/jpeg" });
-    console.log(`✅ [client] HEIC → JPEG: ${newName} (${(converted.size / 1024 / 1024).toFixed(1)}MB)`);
-    return converted;
-  } catch (clientErr) {
-    console.warn(`⚠️ [client] heic2any failed:`, clientErr);
-  }
-
-  // Try 2: Server-side conversion via /api/convert-heic (sharp, more robust)
-  try {
-    console.log(`🔄 [server] Falling back to server conversion...`);
+    console.log(`📤 [server] Converting HEIC: ${file.name} (${sizeMB}MB)`);
     const formData = new FormData();
     formData.append("image", file);
 
@@ -111,8 +100,8 @@ async function ensureDecodable(file: File): Promise<File> {
     console.log(`✅ [server] HEIC → JPEG: ${newName} (${(converted.size / 1024 / 1024).toFixed(1)}MB)`);
     return converted;
   } catch (serverErr) {
-    console.error(`❌ [server] conversion also failed:`, serverErr);
-    throw new Error(`Cannot convert HEIC file "${file.name}". Neither client nor server conversion succeeded.`);
+    console.error(`❌ [server] HEIC conversion failed:`, serverErr);
+    throw new Error(`Cannot convert HEIC file "${file.name}". Server conversion failed: ${serverErr}`);
   }
 }
 

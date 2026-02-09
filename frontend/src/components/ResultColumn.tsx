@@ -429,10 +429,10 @@ function ResultColumnComponent({
 
   // Phase 2: Check if a field should be shown (based on enableGeneration or legacy behavior)
   const hasFieldRole = (requiredRoles: string[]): boolean => {
-    // ✅ FIX: In Create mode, always allow all description fields.
-    // The target template only determines WHERE to save, not WHAT can be generated.
-    // User should be free to generate any description type regardless of target template's fields.
-    if (workMode === 'create') return true;
+    // In Create mode without a template (Download Only), allow all description fields.
+    // When a target template IS selected, currentTemplate = effectiveTemplate from App.tsx,
+    // which is the full targetSpreadsheetTemplate — so fall through to check its columns.
+    if (workMode === 'create' && !currentTemplate) return true;
     
     if (!currentTemplate) return true; // Show all if no template selected
     

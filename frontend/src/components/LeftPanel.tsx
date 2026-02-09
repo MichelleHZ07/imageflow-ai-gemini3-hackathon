@@ -117,6 +117,8 @@ interface LeftPanelProps {
   // All image URLs from spreadsheet (for PER_IMAGE mode)
   allSpreadsheetImageUrls?: string[];
   onLoadMoreImages?: (urls: string[]) => Promise<ImageData[]>;
+  // Bump to force clear caches and reload after save
+  imageRefreshKey?: number;
   // PER_PRODUCT: visible items (export items minus hidden for generation)
   // × button only hides for generation, doesn't delete from export truth
   activeImageItems?: SpreadsheetImageItem[];
@@ -174,6 +176,7 @@ function LeftPanelComponent({
   canNavigateNext = false,
   allSpreadsheetImageUrls = [],
   onLoadMoreImages,
+  imageRefreshKey = 0,
   activeImageItems = [],
   onToggleHideItem,
   onRestoreAllHidden,
@@ -215,6 +218,9 @@ function LeftPanelComponent({
   const [refImagesExpanded, setRefImagesExpanded] = useState(false);
   // Override Modal state
   const [isOverrideModalOpen, setIsOverrideModalOpen] = useState(false);
+  // Image upload processing state (for HEIC conversion feedback)
+  const [isProcessingUpload, setIsProcessingUpload] = useState(false);
+  const [processingFileName, setProcessingFileName] = useState<string>("");
   // Simple cache: URL -> ImageData (cleared on product change)
   const imageCacheRef = useRef<Map<string, ImageData>>(new Map());
   // Cache: itemId -> ImageData (for PER_PRODUCT mode, keyed by stable ID)
@@ -365,6 +371,18 @@ function LeftPanelComponent({
   useEffect(() => {
     setRemovedTargetUrls(new Set());
   }, [targetConfig?.targetProductKey]);
+
+  // Force clear caches and reload when parent bumps imageRefreshKey (after save)
+  const prevRefreshKeyRef = useRef(imageRefreshKey);
+  useEffect(() => {
+    if (imageRefreshKey !== prevRefreshKeyRef.current) {
+      prevRefreshKeyRef.current = imageRefreshKey;
+      console.log("[LeftPanel] imageRefreshKey changed, clearing caches for reload");
+      imageCacheRef.current.clear();
+      itemImageCacheRef.current.clear();
+      setHasLoadedImages(false);
+    }
+  }, [imageRefreshKey]);
 
   // For PER_PRODUCT: detect item changes (including URL replacements) and clear cache
   // Track both IDs and URLs to detect replacements properly
@@ -647,6 +665,20 @@ function LeftPanelComponent({
     const files = Array.from(list).slice(0, 8 - mainPhotos.length);
 
     try {
+      // Show processing status for user feedback
+      const hasHeic = files.some(f => 
+        f.name.toLowerCase().endsWith('.heic') || 
+        f.name.toLowerCase().endsWith('.heif') ||
+        f.type.includes('heic') || 
+        f.type.includes('heif')
+      );
+      if (hasHeic) {
+        setIsProcessingUpload(true);
+        setProcessingFileName(files.find(f => 
+          f.name.toLowerCase().endsWith('.heic') || f.name.toLowerCase().endsWith('.heif')
+        )?.name || "iPhone photo");
+      }
+
       console.log(`📸 Processing ${files.length} main images (triple storage)...`);
       const processedImages = await processImageFiles(files);
       onMainPhotos([...mainPhotos, ...processedImages].slice(0, 8));
@@ -654,6 +686,9 @@ function LeftPanelComponent({
     } catch (error) {
       console.error("❌ Failed to process main images:", error);
       alert("Failed to process images. Please try again.");
+    } finally {
+      setIsProcessingUpload(false);
+      setProcessingFileName("");
     }
   }, [mainPhotos, onMainPhotos]);
 
@@ -664,6 +699,20 @@ function LeftPanelComponent({
     const files = Array.from(list).slice(0, 4 - refImages.length);
 
     try {
+      // Show processing status for user feedback
+      const hasHeic = files.some(f => 
+        f.name.toLowerCase().endsWith('.heic') || 
+        f.name.toLowerCase().endsWith('.heif') ||
+        f.type.includes('heic') || 
+        f.type.includes('heif')
+      );
+      if (hasHeic) {
+        setIsProcessingUpload(true);
+        setProcessingFileName(files.find(f => 
+          f.name.toLowerCase().endsWith('.heic') || f.name.toLowerCase().endsWith('.heif')
+        )?.name || "iPhone photo");
+      }
+
       console.log(`📸 Processing ${files.length} reference images (triple storage)...`);
       const processedImages = await processImageFiles(files);
       onRefImages([...refImages, ...processedImages].slice(0, 4));
@@ -671,6 +720,9 @@ function LeftPanelComponent({
     } catch (error) {
       console.error("❌ Failed to process reference images:", error);
       alert("Failed to process images. Please try again.");
+    } finally {
+      setIsProcessingUpload(false);
+      setProcessingFileName("");
     }
   }, [refImages, onRefImages]);
 
@@ -1506,20 +1558,31 @@ function LeftPanelComponent({
             {/* Upload Images: Empty state card OR compact layout */}
             {mainPhotos.length === 0 ? (
               <RefImagesCard>
-                <RefDropZoneInCard
-                  onClick={() => !isLoading && pickMain()}
-                  style={{ opacity: isLoading ? 0.5 : 1, cursor: isLoading ? 'not-allowed' : 'pointer' }}
-                >
-                  <EmptyStateCardIcon>
-                    <svg viewBox="0 0 24 24">
-                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-                      <polyline points="17 8 12 3 7 8"/>
-                      <line x1="12" y1="3" x2="12" y2="15"/>
-                    </svg>
-                  </EmptyStateCardIcon>
-                  <EmptyStateCardTitle>Upload images</EmptyStateCardTitle>
-                  <EmptyStateCardSubtitle>Up to 8 images</EmptyStateCardSubtitle>
-                </RefDropZoneInCard>
+                {/* Processing status inline */}
+                {isProcessingUpload ? (
+                  <ProcessingInline>
+                    <ProcessingSpinner />
+                    <ProcessingInlineText>
+                      <span>Converting iPhone photo...</span>
+                      <ProcessingFileName>{processingFileName}</ProcessingFileName>
+                    </ProcessingInlineText>
+                  </ProcessingInline>
+                ) : (
+                  <RefDropZoneInCard
+                    onClick={() => !isLoading && pickMain()}
+                    style={{ opacity: isLoading ? 0.5 : 1, cursor: isLoading ? 'not-allowed' : 'pointer' }}
+                  >
+                    <EmptyStateCardIcon>
+                      <svg viewBox="0 0 24 24">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                      </svg>
+                    </EmptyStateCardIcon>
+                    <EmptyStateCardTitle>Upload images</EmptyStateCardTitle>
+                    <EmptyStateCardSubtitle>Up to 8 images</EmptyStateCardSubtitle>
+                  </RefDropZoneInCard>
+                )}
               </RefImagesCard>
             ) : (
               <>
@@ -1545,9 +1608,20 @@ function LeftPanelComponent({
                       ))}
                     </MainGrid>
                   </ScrollableImageGrid>
-                  {/* Choose Files Button - fixed at bottom of panel */}
-                  <ChooseFilesCard onClick={pickMain} disabled={isLoading}>
-                    <ChooseFilesCardLabel>Choose Files</ChooseFilesCardLabel>
+                  {/* Choose Files Button - shows processing state when converting */}
+                  <ChooseFilesCard 
+                    onClick={pickMain} 
+                    disabled={isLoading || isProcessingUpload}
+                    $isProcessing={isProcessingUpload}
+                  >
+                    {isProcessingUpload ? (
+                      <ProcessingInlineSmall>
+                        <ProcessingSpinnerSmall />
+                        <span>Converting {processingFileName}...</span>
+                      </ProcessingInlineSmall>
+                    ) : (
+                      <ChooseFilesCardLabel>Choose Files</ChooseFilesCardLabel>
+                    )}
                   </ChooseFilesCard>
                 </ProductImagesContainer>
               </>
@@ -2820,6 +2894,52 @@ const CreateModeContainer = styled.div`
   overflow: hidden;
 `;
 
+/* ========== Processing Inline for HEIC conversion ========== */
+const ProcessingInline = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px 16px;
+  height: 100%;
+`;
+
+const ProcessingSpinner = styled.div`
+  width: 24px;
+  height: 24px;
+  border: 2px solid ${({ theme }) => theme.colors.border};
+  border-top-color: ${({ theme }) => theme.colors.accent};
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+`;
+
+const ProcessingInlineText = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  
+  span {
+    font-size: 13px;
+    font-weight: 500;
+    color: ${({ theme }) => theme.colors.text};
+  }
+`;
+
+const ProcessingFileName = styled.div`
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.muted};
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
 const ProductImagesContainer = styled.div<{ $hasContent?: boolean }>`
   display: flex;
   flex-direction: column;
@@ -3004,13 +3124,14 @@ const TargetOptionIcon = styled.div<{ $selected?: boolean }>`
 `;
 
 /* Choose Files Card - matches Generate button style */
-const ChooseFilesCard = styled.button`
+const ChooseFilesCard = styled.button<{ $isProcessing?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   padding: 12px 14px;
-  background: ${({ theme }) => theme.colors.accent};
-  color: ${({ theme }) => theme.colors.white};
+  background: ${({ theme, $isProcessing }) => $isProcessing ? theme.colors.inner : theme.colors.accent};
+  color: ${({ theme, $isProcessing }) => $isProcessing ? theme.colors.text : theme.colors.white};
   border: none;
   border-radius: ${({ theme }) => theme.radius.btn};
   font-weight: 700;
@@ -3023,9 +3144,35 @@ const ChooseFilesCard = styled.button`
   }
   
   &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    opacity: ${({ $isProcessing }) => $isProcessing ? 1 : 0.5};
+    cursor: ${({ $isProcessing }) => $isProcessing ? 'default' : 'not-allowed'};
   }
+`;
+
+/* Small inline processing indicator */
+const ProcessingInlineSmall = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  span {
+    font-size: 12px;
+    font-weight: 500;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+`;
+
+const ProcessingSpinnerSmall = styled.div`
+  width: 14px;
+  height: 14px;
+  border: 2px solid ${({ theme }) => theme.colors.border};
+  border-top-color: ${({ theme }) => theme.colors.accent};
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
 `;
 
 const ChooseFilesCardIcon = styled.div`

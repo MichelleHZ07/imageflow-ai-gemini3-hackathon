@@ -161,6 +161,12 @@ function createNewProductRow(headerRow, columns, override, imageUrlColumns, desc
     }
   }
   
+  // Fallback: if product_title is still empty, use SKU or productId
+  const titleIdx = findColumnIndexByRole(columns, "product_title");
+  if (titleIdx >= 0 && !row[titleIdx]) {
+    row[titleIdx] = override.sku || override.productId || "";
+  }
+  
   return row;
 }
 

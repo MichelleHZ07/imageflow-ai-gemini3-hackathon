@@ -198,12 +198,14 @@ export default function CsvTemplatesPage() {
       setSubscriptions(subsData);
       
       // Calculate limit based on subscription
-      const limit = getSpreadsheetLimit(subsData);
+      // Demo users (anonymous, no email) get elevated limit
+      const isDemo = !user.email;
+      const limit = isDemo ? 10 : getSpreadsheetLimit(subsData);
       setSpreadsheetLimit(limit);
       
       // Determine plan name
       const activeSub = subsData.find(s => s.active);
-      setPlanName(activeSub?.planName || "Free");
+      setPlanName(isDemo ? "Demo" : (activeSub?.planName || "Free"));
       
     } catch (error) {
       console.error("Failed to load templates:", error);
@@ -820,7 +822,7 @@ export default function CsvTemplatesPage() {
               {templates.length >= spreadsheetLimit && (
                 <span> · Limit reached</span>
               )}
-              {spreadsheetLimit < SPREADSHEET_LIMITS.studio && (
+              {spreadsheetLimit < SPREADSHEET_LIMITS.studio && planName !== "Demo" && (
                 <UpgradeLink href="/pricing">Upgrade for more</UpgradeLink>
               )}
             </QuotaHint>

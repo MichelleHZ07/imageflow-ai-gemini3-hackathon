@@ -83,7 +83,7 @@ export async function uploadGeneratedImagesToStorage(uid, generationId, results)
 
         const file = bucket.file(filePath);
 
-        // 写入文件并设置为公开访问，带长缓存
+        // 写入文件，带长缓存
         await file.save(Buffer.from(b64, "base64"), {
           contentType: mime || "image/jpeg",
           metadata: {
@@ -91,28 +91,26 @@ export async function uploadGeneratedImagesToStorage(uid, generationId, results)
           },
         });
 
-        // 设置为公开可访问
+        // 设置为公开可访问（前端预览用）
         await file.makePublic();
 
-        // 获取公开 URL
-        const cdnUrl = file.publicUrl();
+        // 生成 Firebase 格式 URL（Shopify/外部服务用，Firebase Rules 生效）
+        const encodedPath = encodeURIComponent(filePath);
+        const cdnUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media`;
 
-        // ⭐ 打印 CDN URL 到终端，方便验证
-        console.log(`[CDN Upload] ✅ Image ${globalIndex} uploaded:`);
-        console.log(`   📁 Storage: ${filePath}`);
-        console.log(`   🔗 CDN URL: ${cdnUrl}`);
+        console.log(`[CDN Upload] Uploaded image ${globalIndex}: ${cdnUrl}`);
 
         updatedImages.push({
           ...img,
           dataUrl,          // 保留 base64，前端立即预览用
-          cdnUrl,           // 新增：CDN 风格图片链接
+          cdnUrl,           // Firebase 格式 URL（Shopify 兼容）
           storagePath: filePath,
         });
 
         uploadedCount++;
         globalIndex++;
       } catch (uploadError) {
-        console.error(`[CDN Upload] ❌ Failed to upload image ${globalIndex}:`, uploadError.message);
+        console.error(`[CDN Upload] Failed to upload image ${globalIndex}:`, uploadError.message);
         // 上传失败时保留原始数据，不中断流程
         updatedImages.push(img);
         globalIndex++;
@@ -128,8 +126,8 @@ export async function uploadGeneratedImagesToStorage(uid, generationId, results)
 
   console.log(`[CDN Upload] ========================================`);
   console.log(`[CDN Upload] Upload Summary:`);
-  console.log(`[CDN Upload]   ✅ Uploaded: ${uploadedCount}`);
-  console.log(`[CDN Upload]   ❌ Failed: ${failedCount}`);
+  console.log(`[CDN Upload]   Uploaded: ${uploadedCount}`);
+  console.log(`[CDN Upload]   Failed: ${failedCount}`);
   console.log(`[CDN Upload] ========================================\n`);
   
   return updatedResults;
@@ -143,7 +141,8 @@ export async function uploadGeneratedImagesToStorage(uid, generationId, results)
  * @param {string} generationId - 生成记录ID
  */
 export async function deleteGenerationImages(uid, generationId) {
-  const bucket = admin.storage().bucket();
+  const bucketName = process.env.FIREBASE_STORAGE_BUCKET || 'imageflow-dev.firebasestorage.app';
+  const bucket = admin.storage().bucket(bucketName);
   const prefix = `users/${uid}/generations/${generationId}/`;
 
   try {

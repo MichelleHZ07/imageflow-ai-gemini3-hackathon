@@ -145,6 +145,8 @@ export default function App() {
   const [targetContentPlatform, setTargetContentPlatform] = useState<PlatformType | null>(null);
 
   const [mainPhotos, setMainPhotos] = useState<ImageData[]>([]);
+  // Bump to force LeftPanel to clear caches and reload after save
+  const [imageRefreshKey, setImageRefreshKey] = useState(0);
   const [refImages, setRefImages] = useState<ImageData[]>([]);
   
   // ✅ FIX: Separate resultURLsRef for each mode to prevent cross-mode cleanup
@@ -852,7 +854,15 @@ export default function App() {
     // enables seoEnabled/tagsEnabled/etc., causing descriptions to generate even though
     // the toggle appears OFF.
     if (workMode === 'create') {
-      console.log(`[App] Create mode: skipping auto-enable of description fields`);
+      console.log(`[App] Create mode: resetting description fields on template change`);
+      setSeoEnabled(false);
+      setGeoEnabled(false);
+      setGsoEnabled(false);
+      setTagsEnabled(false);
+      setMetaTitleEnabled(false);
+      setMetaDescriptionEnabled(false);
+      setSeoTitleEnabled(false);
+      setCustomFieldsEnabled({});
       return;
     }
 
@@ -1845,7 +1855,10 @@ export default function App() {
     // Phase 2: For cross-save, new products, or Create mode with targetConfig, update targetConfig instead of source data
     // Note: For new products in same spreadsheet (isCrossSave=false), we still need to update targetConfig
     // Note: In Create mode without spreadsheetSelection, we use targetConfig directly
-    const isNewProduct = !!(targetConfig as any)?.isNewProduct;
+    // ✅ FIX: isNewProduct must also check saveTargetMode — when user switches back to "original",
+    // targetConfig still has stale isNewProduct=true from previous "different" session,
+    // causing this branch to always trigger and skip source panel updates.
+    const isNewProduct = !!(targetConfig as any)?.isNewProduct && saveTargetMode === "different";
     const isCreateModeWithTarget = workMode === "create" && !spreadsheetSelection && !!targetConfig;
     
     if ((isCrossSave || isNewProduct || isCreateModeWithTarget) && targetConfig) {
@@ -1898,6 +1911,9 @@ export default function App() {
     
     // 1a) Clear mainPhotos to force LeftPanel to reload images from new URLs
     setMainPhotos([]);
+    
+    // ✅ Force LeftPanel to clear internal caches and reload
+    setImageRefreshKey(k => k + 1);
     
     // ✅ Bug 3 Fix: Clear panelActiveImageUrls to force LeftPanel to report new images via onPanelImagesChange
     // This ensures the panel correctly reflects the new image count after save
@@ -2433,8 +2449,10 @@ export default function App() {
     const hasPrompt = mainPrompt.trim() || variations.length > 0;
     if (!hasPrompt && !anyDescriptionEnabled) {
       return setAlert({
-        title: "Missing Prompt",
-        message: "Please provide a main prompt or add manual variations, or enable Product Descriptions to generate text only.",
+        title: "Nothing to Generate",
+        message: skuEnabled
+          ? "SKU naming alone isn't enough to start generation. Write a prompt in Main Brief to generate images, or enable the Product Descriptions toggle in Result → Settings to generate text fields only."
+          : "Please write a prompt in Main Brief to generate images, or enable the Product Descriptions toggle in Result → Settings to generate text fields only.",
       });
     }
 
@@ -3116,6 +3134,7 @@ export default function App() {
               canNavigateNext={canNavigateNext}
               allSpreadsheetImageUrls={allSpreadsheetImageUrls}
               onLoadMoreImages={handleLoadMoreImages}
+              imageRefreshKey={imageRefreshKey}
               // PER_PRODUCT: visible items = export items minus hidden (for generation filtering)
               // × button only hides for generation, doesn't delete from export truth
               activeImageItems={visibleImageItems}

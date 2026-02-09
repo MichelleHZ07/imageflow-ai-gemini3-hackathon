@@ -82,9 +82,8 @@ export function getImageDimensions(
 /** Build resolution dropdown options with computed W×H labels */
 export function getResolutionOptions(aspectRatio: AspectRatio) {
   return RESOLUTION_TIERS.map((tier) => {
-    const { width, height } = getImageDimensions(aspectRatio, tier);
     const tierLabel = RESOLUTION_TIER_LABELS[tier];
-    return { value: tier, label: `${tierLabel} — ${width} × ${height}` };
+    return { value: tier, label: tierLabel };
   });
 }
 

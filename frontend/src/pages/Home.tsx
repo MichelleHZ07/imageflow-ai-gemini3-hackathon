@@ -4,15 +4,14 @@ import styled, { keyframes } from 'styled-components'
 
 export default function Home() {
   const [activeTemplate, setActiveTemplate] = useState(0);
-  
+
   // Placeholder templates - replace with real before/after images later
   const templates = [
-    { id: 0, category: "Jewelry", title: "Elegant Ring Display" },
-    { id: 1, category: "Fashion", title: "Model Showcase" },
-    { id: 2, category: "Beauty", title: "Skincare Product" },
-    { id: 3, category: "Food", title: "Gourmet Presentation" },
-    { id: 4, category: "Decor", title: "Home Styling" },
-    { id: 5, category: "Accessories", title: "Watch Photography" },
+    { id: 0, category: "Multi-Angle", title: "Same Model, Different Angles" },
+    { id: 1, category: "Still Life", title: "Same Scene, Multiple Products" },
+    { id: 2, category: "White Background", title: "Clean Product Cutout" },
+    { id: 3, category: "Detail Page", title: "Product Detail Page Generation" },
+    { id: 4, category: "Lifestyle", title: "Product in Context" },
   ];
 
   return (
@@ -21,18 +20,19 @@ export default function Home() {
       <HeroSection>
         <HeroContainer>
           <HeroContent>
-            <HeroBadge>AI-Powered Product Photography</HeroBadge>
+            <HeroBadge>Powered by Google Gemini</HeroBadge>
             <HeroTitle>
-              Create professional product images with AI
+              Snap to Sell
             </HeroTitle>
             <HeroSubtitle>
-              Minimal input. Studio-grade output. Transform your product photos into 
-              stunning visuals for jewelry, fashion, beauty, food, decor and more.
+              From a single product photo to a complete, platform-ready listing — 
+              images, marketing copy, and catalog management in one place. 
+              Stop switching between tools.
             </HeroSubtitle>
             <HeroButtons>
-              <Link to="/app">
+              <Link to="/demo">
                 <PrimaryButton>
-                  Start Creating
+                  Try Demo
                   <ButtonArrow>→</ButtonArrow>
                 </PrimaryButton>
               </Link>
@@ -43,11 +43,15 @@ export default function Home() {
           </HeroContent>
           
           <HeroVisual>
-            <VideoPlaceholder>
-              <PlaceholderIcon>▶</PlaceholderIcon>
-              <PlaceholderText>Product Demo Video</PlaceholderText>
-              <PlaceholderHint>Upload your demo video here</PlaceholderHint>
-            </VideoPlaceholder>
+            <VideoContainer>
+              <YouTubeEmbed
+                src="https://www.youtube.com/embed/9rzWCOaXHQg"
+                title="ImageFlow Demo Video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </VideoContainer>
           </HeroVisual>
         </HeroContainer>
       </HeroSection>
@@ -56,29 +60,78 @@ export default function Home() {
       <StatsSection>
         <StatsContainer>
           <StatItem>
-            <StatNumber>10x</StatNumber>
-            <StatLabel>Faster than traditional photoshoots</StatLabel>
+            <StatNumber>3-in-1</StatNumber>
+            <StatLabel>Image generation + copywriting + catalog management</StatLabel>
           </StatItem>
           <StatDivider />
           <StatItem>
-            <StatNumber>90%</StatNumber>
-            <StatLabel>Cost savings on product photography</StatLabel>
+            <StatNumber>12</StatNumber>
+            <StatLabel>Supported platforms including Shopify, Amazon, eBay & more</StatLabel>
           </StatItem>
           <StatDivider />
           <StatItem>
-            <StatNumber>∞</StatNumber>
-            <StatLabel>Creative possibilities per product</StatLabel>
+            <StatNumber>4K</StatNumber>
+            <StatLabel>Resolution AI-generated product images</StatLabel>
           </StatItem>
         </StatsContainer>
       </StatsSection>
+
+      {/* ===== THE PROBLEM ===== */}
+      <GallerySection>
+        <SectionHeader>
+          <SectionLabel>The Problem</SectionLabel>
+          <SectionTitle>Sellers are trapped switching between apps</SectionTitle>
+          <SectionSubtitle>
+            3.5 million small and medium e-commerce sellers share the same daily struggle.
+          </SectionSubtitle>
+        </SectionHeader>
+        
+        <ProblemGrid>
+          <ProblemCard>
+            <ProblemIcon>📸</ProblemIcon>
+            <ProblemTitle>Image generation is broken</ProblemTitle>
+            <ProblemText>
+              AI tools cram multiple angles into a single image instead of generating 
+              one angle per image — making outputs unusable for product listings.
+            </ProblemText>
+          </ProblemCard>
+          
+          <ProblemCard>
+            <ProblemIcon>📝</ProblemIcon>
+            <ProblemTitle>Marketing copy is fragmented</ProblemTitle>
+            <ProblemText>
+              Every platform has different SEO rules, character limits, and best practices. 
+              Sellers research and write tailored copy for each one, then copy-paste into spreadsheets.
+            </ProblemText>
+          </ProblemCard>
+          
+          <ProblemCard>
+            <ProblemIcon>📁</ProblemIcon>
+            <ProblemTitle>File naming is manual labor</ProblemTitle>
+            <ProblemText>
+              Generated images come out as image_001.png — sellers manually rename 
+              hundreds of files to match product SKUs before uploading to any platform.
+            </ProblemText>
+          </ProblemCard>
+          
+          <ProblemCard>
+            <ProblemIcon>🔄</ProblemIcon>
+            <ProblemTitle>PIM tools don't solve the root problem</ProblemTitle>
+            <ProblemText>
+              Product Information Management handles distribution, but can't generate or update 
+              the images and copy themselves. Sellers still switch between 3+ disconnected tools.
+            </ProblemText>
+          </ProblemCard>
+        </ProblemGrid>
+      </GallerySection>
 
       {/* ===== HOW IT WORKS ===== */}
       <SectionWrapper>
         <SectionHeader>
           <SectionLabel>How It Works</SectionLabel>
-          <SectionTitle>Three simple steps to stunning visuals</SectionTitle>
+          <SectionTitle>Two-layer AI image generation pipeline</SectionTitle>
           <SectionSubtitle>
-            No design skills needed. Just upload, customize, and download.
+            A unique approach that solves the "multiple angles in one image" problem.
           </SectionSubtitle>
         </SectionHeader>
         
@@ -90,9 +143,10 @@ export default function Home() {
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
               </svg>
             </StepIcon>
-            <StepTitle>Upload Your Product</StepTitle>
+            <StepTitle>Upload & Describe</StepTitle>
             <StepDescription>
-              Upload any product photo. Our AI works with images from any angle or quality.
+              Upload a product photo and describe your vision. 
+              "Generate this product in the same scene but different angles."
             </StepDescription>
           </StepCard>
           
@@ -100,13 +154,13 @@ export default function Home() {
             <StepNumber>02</StepNumber>
             <StepIcon>
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
               </svg>
             </StepIcon>
-            <StepTitle>Customize Your Style</StepTitle>
+            <StepTitle>AI Decomposes & Generates</StepTitle>
             <StepDescription>
-              Describe your vision or choose from templates. Set the scene, lighting, and mood.
+              Gemini Flash analyzes your prompt into N specific scene descriptions. 
+              Then Gemini Pro generates each as a separate, professional image in parallel.
             </StepDescription>
           </StepCard>
           
@@ -117,21 +171,123 @@ export default function Home() {
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
               </svg>
             </StepIcon>
-            <StepTitle>Download & Use</StepTitle>
+            <StepTitle>Download or Save to Catalog</StepTitle>
             <StepDescription>
-              Get studio-quality images instantly. Ready for your store, ads, or social media.
+              Get CDN-hosted images with auto-generated SKU names. 
+              Save directly into your product spreadsheet with AI-written marketing copy.
             </StepDescription>
           </StepCard>
         </StepsGrid>
       </SectionWrapper>
 
+      {/* ===== FEATURES SECTION ===== */}
+      <SectionWrapper $alt>
+        <SectionHeader>
+          <SectionLabel>Features</SectionLabel>
+          <SectionTitle>Everything from photo to live listing</SectionTitle>
+          <SectionSubtitle>
+            Image generation, marketing copy, and catalog management — unified in one workflow.
+          </SectionSubtitle>
+        </SectionHeader>
+        
+        <FeaturesGrid>
+          <FeatureCard>
+            <FeatureIcon>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <path d="M21 15l-5-5L5 21"/>
+              </svg>
+            </FeatureIcon>
+            <FeatureTitle>Two-Layer AI Image Generation</FeatureTitle>
+            <FeatureDescription>
+              Gemini Flash decomposes your prompt into distinct scenes, then Gemini Pro generates each 
+              as a separate image. Up to 8 images per session, 10 aspect ratios, up to 4K resolution.
+            </FeatureDescription>
+          </FeatureCard>
+          
+          <FeatureCard>
+            <FeatureIcon>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <path d="M14 2v6h6M16 13H8M16 17H8"/>
+              </svg>
+            </FeatureIcon>
+            <FeatureTitle>Platform-Specific Marketing Copy</FeatureTitle>
+            <FeatureDescription>
+              AI-generated SEO, GEO, and GSO descriptions, tags, meta titles, and more — 
+              tailored for Shopify, Amazon, eBay, TikTok, and 8 other platforms. One click to switch.
+            </FeatureDescription>
+          </FeatureCard>
+          
+          <FeatureCard>
+            <FeatureIcon>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <path d="M14 2v6h6"/>
+                <line x1="8" y1="13" x2="16" y2="13"/>
+                <line x1="8" y1="17" x2="16" y2="17"/>
+              </svg>
+            </FeatureIcon>
+            <FeatureTitle>Built-In Catalog Management</FeatureTitle>
+            <FeatureDescription>
+              Import CSV/Excel catalogs, browse products visually, edit in-app, 
+              and export for direct import into any merchant platform. 
+              Cross-spreadsheet save for multi-platform sellers.
+            </FeatureDescription>
+          </FeatureCard>
+          
+          <FeatureCard>
+            <FeatureIcon>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+                <line x1="7" y1="7" x2="7.01" y2="7"/>
+              </svg>
+            </FeatureIcon>
+            <FeatureTitle>SKU Template Engine</FeatureTitle>
+            <FeatureDescription>
+              Pattern-based naming with brand initials, category codes, colors, sizes, 
+              and auto-assigned sequence numbers. Up to 20 templates per account.
+            </FeatureDescription>
+          </FeatureCard>
+          
+          <FeatureCard>
+            <FeatureIcon>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+              </svg>
+            </FeatureIcon>
+            <FeatureTitle>CDN-Hosted Images</FeatureTitle>
+            <FeatureDescription>
+              Every generated image gets a universally accessible CDN URL automatically. 
+              Import into any platform without domain restrictions or manual re-hosting.
+            </FeatureDescription>
+          </FeatureCard>
+          
+          <FeatureCard>
+            <FeatureIcon>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+              </svg>
+            </FeatureIcon>
+            <FeatureTitle>Cross-Border Ready</FeatureTitle>
+            <FeatureDescription>
+              Built-in proxy for Chinese CDN anti-hotlinking (Alibaba, 1688, Taobao), 
+              ERP platform support (Dianxiaomi), and HEIC iPhone photo conversion.
+            </FeatureDescription>
+          </FeatureCard>
+        </FeaturesGrid>
+      </SectionWrapper>
+
       {/* ===== BEFORE/AFTER GALLERY ===== */}
       <GallerySection>
         <SectionHeader>
-          <SectionLabel>Templates</SectionLabel>
-          <SectionTitle>Transform any product photo</SectionTitle>
+          <SectionLabel>Use Cases</SectionLabel>
+          <SectionTitle>One photo, endless possibilities</SectionTitle>
           <SectionSubtitle>
-            See the magic in action. Click through our before & after examples.
+            See how ImageFlow transforms a single product photo into platform-ready visuals.
           </SectionSubtitle>
         </SectionHeader>
         
@@ -184,162 +340,18 @@ export default function Home() {
         </GalleryContainer>
       </GallerySection>
 
-      {/* ===== FEATURES SECTION ===== */}
-      <SectionWrapper>
-        <SectionHeader>
-          <SectionLabel>Features</SectionLabel>
-          <SectionTitle>Everything you need for product visuals</SectionTitle>
-          <SectionSubtitle>
-            Powerful AI tools designed specifically for e-commerce and product photography.
-          </SectionSubtitle>
-        </SectionHeader>
-        
-        <FeaturesGrid>
-          <FeatureCard>
-            <FeatureIcon>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                <circle cx="8.5" cy="8.5" r="1.5"/>
-                <path d="M21 15l-5-5L5 21"/>
-              </svg>
-            </FeatureIcon>
-            <FeatureTitle>Studio-Quality Photos</FeatureTitle>
-            <FeatureDescription>
-              Generate professional product images with perfect lighting, shadows, and composition.
-            </FeatureDescription>
-          </FeatureCard>
-          
-          <FeatureCard>
-            <FeatureIcon>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-              </svg>
-            </FeatureIcon>
-            <FeatureTitle>Scene Generation</FeatureTitle>
-            <FeatureDescription>
-              Place products in realistic lifestyle scenes that resonate with your target audience.
-            </FeatureDescription>
-          </FeatureCard>
-          
-          <FeatureCard>
-            <FeatureIcon>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                <path d="M14 2v6h6"/>
-                <line x1="8" y1="13" x2="16" y2="13"/>
-                <line x1="8" y1="17" x2="16" y2="17"/>
-              </svg>
-            </FeatureIcon>
-            <FeatureTitle>Spreadsheet Integration</FeatureTitle>
-            <FeatureDescription>
-              Bulk process products with CSV/Excel integration. Perfect for large catalogs.
-            </FeatureDescription>
-          </FeatureCard>
-          
-          <FeatureCard>
-            <FeatureIcon>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
-                <line x1="7" y1="7" x2="7.01" y2="7"/>
-              </svg>
-            </FeatureIcon>
-            <FeatureTitle>SKU Management</FeatureTitle>
-            <FeatureDescription>
-              Automatically generate consistent file names with customizable SKU templates.
-            </FeatureDescription>
-          </FeatureCard>
-          
-          <FeatureCard>
-            <FeatureIcon>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                <path d="M14 2v6h6M16 13H8M16 17H8"/>
-              </svg>
-            </FeatureIcon>
-            <FeatureTitle>SEO Descriptions</FeatureTitle>
-            <FeatureDescription>
-              Generate optimized product descriptions for different platforms automatically.
-            </FeatureDescription>
-          </FeatureCard>
-          
-          <FeatureCard>
-            <FeatureIcon>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                <line x1="1" y1="10" x2="23" y2="10"/>
-              </svg>
-            </FeatureIcon>
-            <FeatureTitle>Flexible Pricing</FeatureTitle>
-            <FeatureDescription>
-              Pay-per-use credits or monthly plans. Scale as your business grows.
-            </FeatureDescription>
-          </FeatureCard>
-        </FeaturesGrid>
-      </SectionWrapper>
-
-      {/* ===== TESTIMONIALS ===== */}
-      <TestimonialsSection>
-        <SectionHeader>
-          <SectionLabel>Testimonials</SectionLabel>
-          <SectionTitle>Loved by sellers worldwide</SectionTitle>
-        </SectionHeader>
-        
-        <TestimonialsGrid>
-          <TestimonialCard>
-            <TestimonialQuote>
-              "This tool has completely transformed our product photography workflow. 
-              What used to take hours now takes minutes."
-            </TestimonialQuote>
-            <TestimonialAuthor>
-              <AuthorAvatar>E</AuthorAvatar>
-              <AuthorInfo>
-                <AuthorName>E-commerce Seller</AuthorName>
-                <AuthorRole>Jewelry Store Owner</AuthorRole>
-              </AuthorInfo>
-            </TestimonialAuthor>
-          </TestimonialCard>
-          
-          <TestimonialCard>
-            <TestimonialQuote>
-              "The quality is incredible. My products look like they were shot in a 
-              professional studio, but I did it all from my desk."
-            </TestimonialQuote>
-            <TestimonialAuthor>
-              <AuthorAvatar>S</AuthorAvatar>
-              <AuthorInfo>
-                <AuthorName>Small Business Owner</AuthorName>
-                <AuthorRole>Fashion Accessories</AuthorRole>
-              </AuthorInfo>
-            </TestimonialAuthor>
-          </TestimonialCard>
-          
-          <TestimonialCard>
-            <TestimonialQuote>
-              "The spreadsheet integration is a game-changer for our catalog. 
-              We process hundreds of products seamlessly."
-            </TestimonialQuote>
-            <TestimonialAuthor>
-              <AuthorAvatar>M</AuthorAvatar>
-              <AuthorInfo>
-                <AuthorName>Marketing Manager</AuthorName>
-                <AuthorRole>Home Decor Brand</AuthorRole>
-              </AuthorInfo>
-            </TestimonialAuthor>
-          </TestimonialCard>
-        </TestimonialsGrid>
-      </TestimonialsSection>
-
       {/* ===== FINAL CTA ===== */}
       <CTASection>
         <CTAContainer>
-          <CTATitle>Ready to transform your product photos?</CTATitle>
+          <CTATitle>See it in action</CTATitle>
           <CTASubtitle>
-            Start creating stunning visuals today. No credit card required to try.
+            Try the full workflow with 5,000 free credits and pre-loaded sample catalogs. 
+            No signup required.
           </CTASubtitle>
           <CTAButtons>
-            <Link to="/app">
+            <Link to="/demo">
               <PrimaryButton $large $inverted>
-                Get Started Free
+                Try Demo
                 <ButtonArrow>→</ButtonArrow>
               </PrimaryButton>
             </Link>
@@ -355,6 +367,7 @@ export default function Home() {
             <FooterTagline>AI-powered product photography</FooterTagline>
           </FooterBrand>
           <FooterLinks>
+            <FooterLink to="/demo">Demo</FooterLink>
             <FooterLink to="/app">App</FooterLink>
             <FooterLink to="/pricing">Pricing</FooterLink>
             <FooterLink to="/login">Login</FooterLink>
@@ -378,11 +391,6 @@ const fadeInUp = keyframes`
     opacity: 1;
     transform: translateY(0);
   }
-`;
-
-const float = keyframes`
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
 `;
 
 /* ============ Base Styles ============ */
@@ -476,40 +484,18 @@ const HeroVisual = styled.div`
   animation: ${fadeInUp} 0.6s ease-out 0.2s both;
 `;
 
-const VideoPlaceholder = styled.div`
+const VideoContainer = styled.div`
   background: ${({ theme }) => theme.colors.card};
   border-radius: ${({ theme }) => theme.radius.lg};
   box-shadow: ${({ theme }) => theme.shadow.soft};
-  aspect-ratio: 16 / 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  border: 2px dashed ${({ theme }) => theme.colors.border};
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
 `;
 
-const PlaceholderIcon = styled.div`
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: ${({ theme }) => theme.colors.accent};
-  color: ${({ theme }) => theme.colors.white};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-`;
-
-const PlaceholderText = styled.div`
-  font-size: 18px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-const PlaceholderHint = styled.div`
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.muted};
+const YouTubeEmbed = styled.iframe`
+  width: 100%;
+  height: 100%;
+  border: none;
 `;
 
 /* ============ Buttons ============ */
@@ -588,12 +574,16 @@ const StatNumber = styled.div`
   color: ${({ theme }) => theme.colors.accent};
   line-height: 1;
   margin-bottom: 8px;
+  
+  @media (max-width: 768px) {
+    font-size: 36px;
+  }
 `;
 
 const StatLabel = styled.div`
   font-size: 14px;
   color: ${({ theme }) => theme.colors.muted};
-  max-width: 180px;
+  max-width: 200px;
 `;
 
 const StatDivider = styled.div`
@@ -607,9 +597,63 @@ const StatDivider = styled.div`
   }
 `;
 
+/* ============ Problem Section ============ */
+const ProblemGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+  }
+`;
+
+const ProblemCard = styled.div`
+  background: ${({ theme }) => theme.colors.bg};
+  border-radius: ${({ theme }) => theme.radius.lg};
+  padding: 28px;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-4px);
+  }
+`;
+
+const ProblemIcon = styled.div`
+  font-size: 28px;
+  margin-bottom: 12px;
+`;
+
+const ProblemTitle = styled.h3`
+  font-size: 16px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.text};
+  margin: 0 0 8px 0;
+`;
+
+const ProblemText = styled.p`
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.muted};
+  margin: 0;
+  line-height: 1.6;
+`;
+
 /* ============ Section Wrapper ============ */
-const SectionWrapper = styled.section`
+const SectionWrapper = styled.section<{ $alt?: boolean }>`
   padding: 80px 24px;
+  background: ${({ $alt, theme }) => $alt ? theme.colors.card : 'transparent'};
+  
+  @media (max-width: 768px) {
+    padding: 60px 20px;
+  }
+`;
+
+const GallerySection = styled.section`
+  padding: 80px 24px;
+  background: ${({ theme }) => theme.colors.card};
   
   @media (max-width: 768px) {
     padding: 60px 20px;
@@ -712,16 +756,61 @@ const StepDescription = styled.p`
   line-height: 1.6;
 `;
 
-/* ============ Gallery Section ============ */
-const GallerySection = styled.section`
-  padding: 80px 24px;
-  background: ${({ theme }) => theme.colors.card};
+/* ============ Features Section ============ */
+const FeaturesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
   
-  @media (max-width: 768px) {
-    padding: 60px 20px;
+  @media (max-width: 968px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
   }
 `;
 
+const FeatureCard = styled.div`
+  background: ${({ theme }) => theme.colors.bg};
+  border-radius: ${({ theme }) => theme.radius.lg};
+  padding: 28px;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-4px);
+  }
+`;
+
+const FeatureIcon = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: ${({ theme }) => theme.colors.accent}15;
+  color: ${({ theme }) => theme.colors.accent};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+`;
+
+const FeatureTitle = styled.h3`
+  font-size: 16px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.text};
+  margin: 0 0 8px 0;
+`;
+
+const FeatureDescription = styled.p`
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.muted};
+  margin: 0;
+  line-height: 1.5;
+`;
+
+/* ============ Gallery Section ============ */
 const GalleryContainer = styled.div`
   max-width: 900px;
   margin: 0 auto;
@@ -808,6 +897,11 @@ const PlaceholderTextSmall = styled.div`
   color: ${({ theme }) => theme.colors.muted};
 `;
 
+const float = keyframes`
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+`;
+
 const ArrowIcon = styled.div`
   color: ${({ theme }) => theme.colors.accent};
   animation: ${float} 2s ease-in-out infinite;
@@ -839,128 +933,6 @@ const GalleryDescription = styled.p`
   font-size: 14px;
   color: ${({ theme }) => theme.colors.muted};
   margin: 0;
-`;
-
-/* ============ Features Section ============ */
-const FeaturesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  max-width: 1000px;
-  margin: 0 auto;
-  
-  @media (max-width: 968px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const FeatureCard = styled.div`
-  background: ${({ theme }) => theme.colors.card};
-  border-radius: ${({ theme }) => theme.radius.lg};
-  padding: 28px;
-  transition: transform 0.3s ease;
-  
-  &:hover {
-    transform: translateY(-4px);
-  }
-`;
-
-const FeatureIcon = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: ${({ theme }) => theme.colors.accent}15;
-  color: ${({ theme }) => theme.colors.accent};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-`;
-
-const FeatureTitle = styled.h3`
-  font-size: 16px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.text};
-  margin: 0 0 8px 0;
-`;
-
-const FeatureDescription = styled.p`
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.muted};
-  margin: 0;
-  line-height: 1.5;
-`;
-
-/* ============ Testimonials Section ============ */
-const TestimonialsSection = styled.section`
-  padding: 80px 24px;
-  background: ${({ theme }) => theme.colors.card};
-  
-  @media (max-width: 768px) {
-    padding: 60px 20px;
-  }
-`;
-
-const TestimonialsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  max-width: 1000px;
-  margin: 0 auto;
-  
-  @media (max-width: 968px) {
-    grid-template-columns: 1fr;
-    max-width: 500px;
-  }
-`;
-
-const TestimonialCard = styled.div`
-  background: ${({ theme }) => theme.colors.bg};
-  border-radius: ${({ theme }) => theme.radius.lg};
-  padding: 28px;
-`;
-
-const TestimonialQuote = styled.p`
-  font-size: 15px;
-  color: ${({ theme }) => theme.colors.text};
-  line-height: 1.6;
-  margin: 0 0 20px 0;
-  font-style: italic;
-`;
-
-const TestimonialAuthor = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
-
-const AuthorAvatar = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: ${({ theme }) => theme.colors.accent};
-  color: ${({ theme }) => theme.colors.white};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-`;
-
-const AuthorInfo = styled.div``;
-
-const AuthorName = styled.div`
-  font-size: 14px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-const AuthorRole = styled.div`
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.muted};
 `;
 
 /* ============ CTA Section ============ */

@@ -194,7 +194,7 @@ function buildSafeDescriptionsPrompt({
   header,
   productContext,
   rules,
-  maxChars = 3200,
+  maxChars = 4200,
 }) {
   const h = header.trim();
   const p = (productContext || "").trim();
@@ -245,6 +245,60 @@ const PLATFORM_NAMES = {
   pinterest: "Pinterest",
   generic: "Generic E-commerce",
 };
+
+/**
+ * P2: Platform-specific character limits and constraints (updated 2025)
+ */
+function getPlatformLimits(platform) {
+  const limits = {
+    shopify:         { metaTitleChars: 60, metaDescChars: 155, seoTitleChars: 70,  seoWords: '100-200', maxTags: '5-15', tagNotes: 'Use Shopify collection-compatible terms.' },
+    amazon:          { metaTitleChars: 150, metaDescChars: 155, seoTitleChars: 150, seoWords: '150-200', maxTags: '5-10', tagNotes: 'Amazon: NO brand name in tags (already indexed). Each tag = unique search phrase.' },
+    ebay:            { metaTitleChars: 80, metaDescChars: 155, seoTitleChars: 80,  seoWords: '100-150', maxTags: '5-12', tagNotes: 'Include item specifics: brand, MPN, condition.' },
+    etsy:            { metaTitleChars: 60, metaDescChars: 160, seoTitleChars: 140, seoWords: '150-200', maxTags: '13',   tagNotes: 'Etsy: Use ALL 13 tag slots. Multi-word phrases (e.g., "gift for mom" not "gift"). Include style + occasion + recipient terms.' },
+    walmart:         { metaTitleChars: 75, metaDescChars: 155, seoTitleChars: 75,  seoWords: '100-150', maxTags: '5-10', tagNotes: '' },
+    aliexpress:      { metaTitleChars: 128, metaDescChars: 155, seoTitleChars: 128, seoWords: '100-200', maxTags: '5-10', tagNotes: 'Simple English for international buyers.' },
+    tiktok:          { metaTitleChars: 60, metaDescChars: 155, seoTitleChars: 60,  seoWords: '80-120',  maxTags: '5-10', tagNotes: 'Include trending/viral terms where authentic.' },
+    instagram:       { metaTitleChars: 60, metaDescChars: 155, seoTitleChars: 60,  seoWords: '80-150',  maxTags: '5-15', tagNotes: 'Include aesthetic/lifestyle hashtag-friendly terms.' },
+    facebook:        { metaTitleChars: 60, metaDescChars: 155, seoTitleChars: 60,  seoWords: '80-120',  maxTags: '5-10', tagNotes: '' },
+    google_shopping: { metaTitleChars: 150, metaDescChars: 155, seoTitleChars: 150, seoWords: '100-150', maxTags: '5-10', tagNotes: 'Use Google Product Category terms.' },
+    pinterest:       { metaTitleChars: 60, metaDescChars: 155, seoTitleChars: 100, seoWords: '100-150', maxTags: '5-15', tagNotes: 'Include seasonal, event, and inspiration terms.' },
+    generic:         { metaTitleChars: 60, metaDescChars: 155, seoTitleChars: 80,  seoWords: '80-120',  maxTags: '5-15', tagNotes: '' },
+  };
+  return limits[platform] || limits.generic;
+}
+
+/**
+ * P2: Platform tone directive — SHORT, prominent instruction injected at prompt top
+ * This is the KEY differentiator between platforms in the unified prompt
+ */
+function getPlatformToneDirective(platform) {
+  const tones = {
+    shopify: `PLATFORM: Shopify (DTC store). TONE: Warm, brand-friendly, customer-centric. Write like a boutique brand storyteller. Use natural language for Google SEO — no keyword stuffing. Include long-tail search phrases.`,
+    
+    amazon: `PLATFORM: Amazon. TONE: Factual, benefit-driven, spec-focused. Write like a product data sheet that sells. Front-load top keywords in first sentence. NO promotional language, NO "best seller/free shipping/satisfaction guaranteed", NO emojis or special chars (!, $, ?). Include exact specs: dimensions, weight, material. Structure for bullet-point extraction.`,
+    
+    ebay: `PLATFORM: eBay. TONE: Straightforward, detail-oriented, trustworthy. Write like a knowledgeable seller. Include condition terms, exact item specifics (brand, model, MPN), compatibility info. Mention shipping-relevant details.`,
+    
+    etsy: `PLATFORM: Etsy. TONE: Personal, artisanal, story-driven. Write like a craftsperson describing their creation. Emphasize uniqueness, handmade quality, materials, techniques. Include style aesthetics (boho, minimalist, cottagecore). Use gifting language ("perfect gift for her"). Front-load the most descriptive phrase in the first 40 characters.`,
+    
+    walmart: `PLATFORM: Walmart. TONE: Practical, value-oriented, family-friendly. Write like a helpful store associate. Focus on everyday use cases, value proposition, and practical benefits. Clear, no-frills language.`,
+    
+    aliexpress: `PLATFORM: AliExpress. TONE: Specification-focused, clear, internationally accessible. Write for NON-native English speakers — simple sentences, no idioms. Include exact measurements in both cm/inches, weight in g/oz. Mention size chart, color accuracy, material composition.`,
+    
+    tiktok: `PLATFORM: TikTok Shop. TONE: Short, punchy, trend-aware. Write like a viral product caption. Keep descriptions BRIEF (80-120 words max). Use casual, Gen-Z-friendly language where appropriate ("aesthetic", "must-have", "obsessed"). Hook the reader in the first line. Focus on visual/experiential appeal.`,
+    
+    instagram: `PLATFORM: Instagram Shop. TONE: Aspirational, lifestyle-driven, visually evocative. Write like a lifestyle brand post. Describe how the product fits into the customer's life. Include styling suggestions. Use hashtag-friendly terms naturally (minimalist, handmade, sustainable).`,
+    
+    facebook: `PLATFORM: Facebook Marketplace. TONE: Conversational, honest, community-oriented. Write like you're describing the product to a neighbor. Include condition, dimensions, practical details. Quick-fact format, 80-120 words.`,
+    
+    google_shopping: `PLATFORM: Google Shopping. TONE: Precise, attribute-rich, structured. Write for machine readability and comparison shopping. Include brand, GTIN/MPN, exact product type, color, size, material. Use Google Product Category taxonomy terms. Specificity wins: "Women's 14K Gold-Plated Sterling Silver Tennis Bracelet" not "Gold Bracelet".`,
+    
+    pinterest: `PLATFORM: Pinterest. TONE: Inspirational, aspirational, planning-oriented. Write for dreamers and planners. Include "inspiration", "how to style", seasonal/event terms (wedding, holiday, home makeover). Make the reader want to save/pin this for later.`,
+    
+    generic: `PLATFORM: Generic e-commerce. TONE: Professional, balanced, SEO-friendly. Write clear product descriptions with natural keyword inclusion.`,
+  };
+  return tones[platform] || tones.generic;
+}
 
 export async function handleGenerateRequest(req, res) {
   let deducted = false;
@@ -1126,27 +1180,41 @@ async function generateAllDescriptions({
     maxChars: 900, // Limit product info to prevent token overflow
   });
   
-  // Build description instructions for each type
+  // Determine primary platform (use seoPlatform as default, or first enabled platform)
+  const primaryPlatform = seoEnabled ? seoPlatform : 
+                          geoEnabled ? geoPlatform : 
+                          gsoEnabled ? gsoPlatform : 
+                          contentPlatform || "generic";
+  const platformTone = getPlatformToneDirective(primaryPlatform);
+  
+  // Build description instructions for each type (COMPACT — limits only, tone is at top)
   const typeInstructions = enabledTypes.map(({ type, key, platform, isCustom }) => {
     const platformName = PLATFORM_NAMES[platform] || "e-commerce";
+    const platformLimits = getPlatformLimits(platform);
+    
     if (type === 'SEO') {
-      return `- "seo": A keyword-optimized description for ${platformName} (2-3 sentences, max 120 words). Start with "${productName}".${brand ? ` Include "${brand}" naturally.` : ''} Focus on searchable terms.`;
+      const wordLimit = platformLimits.seoWords || '80-120';
+      return `- "seo": Keyword-optimized description for ${platformName} (2-3 sentences, ${wordLimit} words). Start with "${productName}".${brand ? ` Include "${brand}".` : ''} Follow the PLATFORM TONE above.`;
     } else if (type === 'GEO') {
-      return `- "geo": A semantic description optimized for ${platformName} AI search engines (2-3 sentences). Define what the product IS.${brand ? ` Mention "${brand}".` : ''} Help AI understand the product category and attributes.`;
+      return `- "geo": Semantic description for ${platformName} AI search engines (2-3 sentences). Define what the product IS.${brand ? ` Mention "${brand}".` : ''} Help AI categorize this product.`;
     } else if (type === 'GSO') {
-      return `- "gso": An encyclopedia-style description for ${platformName} AI recommendations (3-4 sentences).${brand ? ` Include "${brand}".` : ''} Describe category, target audience, and typical uses objectively.`;
+      return `- "gso": Encyclopedia-style description for ${platformName} AI recommendations (3-4 sentences).${brand ? ` Include "${brand}".` : ''} Objective: category, audience, typical uses.`;
     } else if (type === 'TAGS') {
-      return `- "tags": An array of 5-15 relevant product tags for ${platformName}. Extract from title/description/category. Include: category terms, materials, colors, styles, use cases. Example: ["silver jewelry", "minimalist", "gift for her"]. Do NOT invent features not mentioned.`;
+      const tagCount = platformLimits.maxTags || '5-15';
+      const tagNote = platformLimits.tagNotes || '';
+      return `- "tags": Array of ${tagCount} product tags for ${platformName}. Include: category, materials, colors, styles, use cases.${tagNote ? ` ${tagNote}` : ''} Do NOT invent features.`;
     } else if (type === 'META_TITLE') {
-      return `- "meta_title": A page meta title optimized for ${platformName} SEO (max 60 characters). Include product name and key attribute. Example: "Silver Clover Bracelet | Minimalist Women's Jewelry"`;
+      const titleLimit = platformLimits.metaTitleChars || 60;
+      return `- "meta_title": Page meta title for ${platformName} SEO (max ${titleLimit} chars). Product name + key attribute.`;
     } else if (type === 'META_DESC') {
-      return `- "meta_description": A page meta description for ${platformName} (max 155 characters). Summarize product appeal and encourage clicks. Include "${productName}".`;
+      const descLimit = platformLimits.metaDescChars || 155;
+      return `- "meta_description": Meta description for ${platformName} (max ${descLimit} chars). Summarize appeal, encourage clicks.`;
     } else if (type === 'SEO_TITLE') {
-      return `- "seo_title": A keyword-optimized product title for ${platformName} (max 80 characters). Include key searchable terms.${brand ? ` Include "${brand}".` : ''}`;
+      const seoTitleLimit = platformLimits.seoTitleChars || 80;
+      return `- "seo_title": Keyword-optimized product title for ${platformName} (max ${seoTitleLimit} chars).${brand ? ` Include "${brand}".` : ''}`;
     } else if (type === 'CUSTOM' && isCustom) {
-      // Generate instruction for custom field based on field name
       const fieldLabel = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-      return `- "${key}": Generate appropriate content for the "${fieldLabel}" field for ${platformName}. Infer the expected content type from the field name and provide a suitable value based on the product information. Keep it concise and relevant.`;
+      return `- "${key}": Content for "${fieldLabel}" field for ${platformName}. Infer type from field name. Concise and relevant.`;
     }
     return '';
   }).filter(Boolean).join('\n');
@@ -1155,8 +1223,12 @@ async function generateAllDescriptions({
   const jsonFields = enabledTypes.map(({ key }) => `"${key}"`).join(', ');
   
   // === PROMPT STRUCTURE (3 parts) ===
-  // Part 1: Header (role intro - NEVER truncated)
-  const promptHeader = `You are an expert e-commerce copywriter. Write product descriptions based ONLY on the product information and images below.`;
+  // Part 1: Header (role intro + PLATFORM TONE - NEVER truncated)
+  const promptHeader = `You are an expert e-commerce copywriter. Write product descriptions based ONLY on the product information and images below.
+
+=== PLATFORM TONE (MUST FOLLOW) ===
+${platformTone}
+===================================`;
 
   // Part 2: Product Context (CAN be truncated if needed)
   const promptContext = `=== PRODUCT INFO ===
@@ -1217,8 +1289,9 @@ Example format (include ONLY the requested fields):
 Now generate the JSON:`;
 
   // === BUILD FINAL PROMPT WITH LENGTH CONTROL ===
-  // Priority: header + rules are NEVER truncated, only productContext can be truncated
-  const maxPromptChars = 3200;
+  // Priority: header (with platform tone) + rules are NEVER truncated, only productContext can be truncated
+  // P2: Increased limit to accommodate platform tone directive in header
+  const maxPromptChars = 4200;
   const fixedLength = promptHeader.length + promptRules.length + 8; // 8 for newlines
   const availableForContext = maxPromptChars - fixedLength;
   
@@ -1253,8 +1326,8 @@ Now generate the JSON:`;
   }
   
   // Calculate maxOutputTokens based on number of fields
-  // Base: 2000 tokens for standard fields, +300 per custom field
-  const baseTokens = 2000;
+  // P2: Slightly increased base for platform-aware descriptions
+  const baseTokens = 2200;
   const customFieldCount = customFieldKeys.length;
   const dynamicMaxTokens = Math.min(baseTokens + (customFieldCount * 300), 4096);
   
@@ -1464,18 +1537,21 @@ Now generate the JSON:`;
         }
       }
       if (metaTitleEnabled && parsed.meta_title && typeof parsed.meta_title === 'string' && parsed.meta_title.length > 5) {
-        descriptions.meta_title = parsed.meta_title.trim().substring(0, 60);  // Enforce limit
-        console.log(`[Generate] Meta Title parsed: "${descriptions.meta_title}"`);
+        const mtLimit = getPlatformLimits(seoPlatform).metaTitleChars || 60;
+        descriptions.meta_title = parsed.meta_title.trim().substring(0, mtLimit);
+        console.log(`[Generate] Meta Title parsed (limit ${mtLimit}): "${descriptions.meta_title}"`);
         successCount++;
       }
       if (metaDescriptionEnabled && parsed.meta_description && typeof parsed.meta_description === 'string' && parsed.meta_description.length > 10) {
-        descriptions.meta_description = parsed.meta_description.trim().substring(0, 155);  // Enforce limit
-        console.log(`[Generate] Meta Description parsed: "${descriptions.meta_description.substring(0, 60)}..."`);
+        const mdLimit = getPlatformLimits(seoPlatform).metaDescChars || 155;
+        descriptions.meta_description = parsed.meta_description.trim().substring(0, mdLimit);
+        console.log(`[Generate] Meta Description parsed (limit ${mdLimit}): "${descriptions.meta_description.substring(0, 60)}..."`);
         successCount++;
       }
       if (seoTitleEnabled && parsed.seo_title && typeof parsed.seo_title === 'string' && parsed.seo_title.length > 5) {
-        descriptions.seo_title = parsed.seo_title.trim().substring(0, 80);  // Enforce limit
-        console.log(`[Generate] SEO Title parsed: "${descriptions.seo_title}"`);
+        const stLimit = getPlatformLimits(seoPlatform).seoTitleChars || 80;
+        descriptions.seo_title = parsed.seo_title.trim().substring(0, stLimit);
+        console.log(`[Generate] SEO Title parsed (limit ${stLimit}): "${descriptions.seo_title}"`);
         successCount++;
       }
       
@@ -1870,63 +1946,64 @@ Respond with ONLY the description.`;
 }
 
 /**
- * P1b: Platform-specific SEO instructions
+ * P2: Platform-specific SEO instructions (for standalone generator)
+ * Comprehensive rules per marketplace (updated 2025)
  */
 function getPlatformSEOInstructions(platform) {
   const instructions = {
-    shopify: "6. **Shopify-optimized**: Include terms that work well with Shopify's search and collection filters.",
-    amazon: "6. **Amazon A9 optimized**: Front-load keywords, include bullet-point-friendly phrases, mention prime-worthy features.",
-    ebay: "6. **eBay optimized**: Include condition terms, shipping-friendly descriptions, and auction-relevant keywords.",
-    etsy: "6. **Etsy optimized**: Emphasize handmade, vintage, or unique qualities. Include style tags like boho, minimalist, etc.",
-    walmart: "6. **Walmart optimized**: Focus on value proposition, family-friendly language, and everyday use cases.",
-    aliexpress: "6. **AliExpress optimized**: Include international shipping terms, material specifications, and size details.",
-    tiktok: "6. **TikTok Shop optimized**: Use trendy, youth-friendly language. Reference viral trends if applicable.",
-    instagram: "6. **Instagram Shop optimized**: Lifestyle-focused, visually descriptive, hashtag-friendly terms.",
-    facebook: "6. **Facebook Marketplace optimized**: Local-friendly, community-oriented language.",
-    google_shopping: "6. **Google Shopping optimized**: Include GTIN-relevant details, brand names, and specific model identifiers.",
-    pinterest: "6. **Pinterest optimized**: Inspirational language, DIY/styling suggestions, board-worthy descriptions.",
+    shopify: `6. **Shopify SEO Rules**: Write 100-200 words. Natural language for Google SEO — NO keyword stuffing. Include long-tail search phrases customers type on Google. Mention collection/filter-relevant terms. Tone: Warm, brand-friendly, customer-centric (DTC stores).`,
+    amazon: `6. **Amazon A9 Rules (2025)**: Front-load top 2-3 keywords in FIRST sentence. Write 150-200 words. Include exact specs (dimensions, weight, material). NO promotional language ("best seller", "free shipping", "satisfaction guaranteed"). NO emojis or special chars (!, $, ?). Structure for bullet-point extraction. Tone: Factual, benefit-driven.`,
+    ebay: `6. **eBay Rules**: Include condition terms (new/pre-owned/refurbished). Mention item specifics: brand, model, MPN, size, color, material. Include compatibility info if applicable. Write 100-150 words. Tone: Straightforward, trustworthy.`,
+    etsy: `6. **Etsy Rules**: Etsy indexes first 160 chars — front-load keywords there. Emphasize uniqueness: handmade, custom, vintage, one-of-a-kind. Include style tags (boho, minimalist, cottagecore). Use gifting language ("perfect gift for her"). Write 150-200 words. Tone: Personal, artisanal, story-driven.`,
+    walmart: `6. **Walmart Rules**: Focus on value proposition and practical everyday use. Family-friendly language. Mention size options, pack details, age appropriateness. Write 100-150 words. Tone: Practical, no-frills.`,
+    aliexpress: `6. **AliExpress Rules**: Write for international buyers — simple English, no idioms. Include exact specs in both metric/imperial. Mention size chart, color accuracy. Write 100-200 words. Tone: Spec-focused, clear.`,
+    tiktok: `6. **TikTok Shop Rules**: Keep SHORT (80-120 words). Casual, Gen-Z-friendly language ("aesthetic", "must-have"). Hook reader in first line. Focus on visual/experiential appeal. Tone: Punchy, trend-aware.`,
+    instagram: `6. **Instagram Shop Rules**: Lifestyle-focused, describe how product fits into customer's life. Include styling suggestions. Use hashtag-friendly terms naturally. Write 80-150 words. Tone: Aspirational, visually evocative.`,
+    facebook: `6. **Facebook Marketplace Rules**: Include condition, dimensions, practical details. Quick-fact format. Write 80-120 words. Tone: Conversational, community-oriented.`,
+    google_shopping: `6. **Google Shopping Rules**: Include brand, GTIN/MPN, exact product type, color, size, material. Use Google Product Category terms. Be specific: "Women's 14K Gold-Plated Sterling Silver Tennis Bracelet" not "Gold Bracelet". Tone: Precise, structured.`,
+    pinterest: `6. **Pinterest Rules**: Inspirational, planning-oriented copy. Include "how to style", seasonal/event terms. Make reader want to pin for later. Write 100-150 words. Tone: Aspirational, visual.`,
     generic: "",
   };
   return instructions[platform] || "";
 }
 
 /**
- * P1b: Platform-specific GEO instructions
+ * P2: Platform-specific GEO instructions (for standalone generator)
  */
 function getPlatformGEOInstructions(platform) {
   const instructions = {
-    shopify: "5. **Shopify context**: Structure for Shopify's product taxonomy and metafields.",
-    amazon: "5. **Amazon context**: Include A+ content-ready specifications and comparison-friendly attributes.",
-    ebay: "5. **eBay context**: Include item specifics and condition-related attributes.",
-    etsy: "5. **Etsy context**: Emphasize artisan qualities, customization options, and style categories.",
-    walmart: "5. **Walmart context**: Focus on department categorization and everyday practical use.",
-    aliexpress: "5. **AliExpress context**: Include detailed specifications for international buyers.",
-    tiktok: "5. **TikTok context**: Include trend-relevant attributes and Gen-Z appeal factors.",
-    instagram: "5. **Instagram context**: Lifestyle categorization and aesthetic attributes.",
-    facebook: "5. **Facebook context**: Community and local relevance attributes.",
-    google_shopping: "5. **Google Shopping context**: Structured data-friendly attributes and category compliance.",
-    pinterest: "5. **Pinterest context**: Visual categorization and inspiration-board attributes.",
+    shopify: `5. **Shopify GEO**: Structure for Shopify's product taxonomy/metafields. Include collection-compatible attributes. Define using Shopify category tree language.`,
+    amazon: `5. **Amazon GEO**: Structure as A+ Content-ready specs. Include Amazon Browse Node categorization. Comparison-friendly attribute-value pairs. NO subjective claims.`,
+    ebay: `5. **eBay GEO**: Include Item Specifics-compatible attributes (brand, MPN, UPC, condition). Structure for eBay's catalog matching. Include compatibility info.`,
+    etsy: `5. **Etsy GEO**: Define within handmade/vintage/supplies taxonomy. Include artisan-process attributes (technique, tool, method). Specify customization options and material sourcing.`,
+    walmart: `5. **Walmart GEO**: Structure for Walmart's department/category hierarchy. Include value-tier positioning (budget/mid-range/premium). Pack/quantity details.`,
+    aliexpress: `5. **AliExpress GEO**: Include EXACT specs in metric + imperial. Structure for AliExpress categories. Shipping-relevant attributes. Mention certifications if relevant.`,
+    tiktok: `5. **TikTok GEO**: Include trend-category attributes. Define audience segments (Gen Z, beauty enthusiast). Include "viral potential" attributes.`,
+    instagram: `5. **Instagram GEO**: Include lifestyle-category attributes. Define aesthetic category (minimalist, boho, coastal). Structure for Instagram's product tagging.`,
+    facebook: `5. **Facebook GEO**: Include local-market attributes (condition, availability, dimensions). Structure for Facebook's commerce categories.`,
+    google_shopping: `5. **Google Shopping GEO**: CRITICAL: Structure for Google's Product Data Specification. Include Google Product Category terms. Required attributes: color, size, material, gender, age_group.`,
+    pinterest: `5. **Pinterest GEO**: Include visual-search-compatible attributes. Define for Pinterest catalog categories. Include inspiration-board categorization.`,
     generic: "",
   };
   return instructions[platform] || "";
 }
 
 /**
- * P1b: Platform-specific GSO instructions
+ * P2: Platform-specific GSO instructions (for standalone generator)
  */
 function getPlatformGSOInstructions(platform) {
   const instructions = {
-    shopify: "6. **Shopify marketplace context**: Position within Shopify's ecosystem and merchant types.",
-    amazon: "6. **Amazon marketplace context**: Compare to Amazon Best Sellers rank, Prime eligibility, and category leaders.",
-    ebay: "6. **eBay marketplace context**: Reference auction vs. fixed-price positioning, seller rating relevance.",
-    etsy: "6. **Etsy marketplace context**: Position within handmade/vintage ecosystem, seller story relevance.",
-    walmart: "6. **Walmart marketplace context**: Compare to Walmart's value tiers and everyday essentials.",
-    aliexpress: "6. **AliExpress marketplace context**: Position within global shipping tiers and supplier credibility.",
-    tiktok: "6. **TikTok marketplace context**: Reference viral potential and influencer product comparisons.",
-    instagram: "6. **Instagram marketplace context**: Position within creator economy and lifestyle brands.",
-    facebook: "6. **Facebook marketplace context**: Local market positioning and community relevance.",
-    google_shopping: "6. **Google Shopping context**: Structured for product knowledge panels and comparison shopping.",
-    pinterest: "6. **Pinterest marketplace context**: Position within inspiration and planning purchase journeys.",
+    shopify: `6. **Shopify GSO**: Position within DTC ecosystem. Compare to typical Shopify store price tiers. Mention merchant type (indie brand, artisan, small business). Reference brand-story and exclusivity value.`,
+    amazon: `6. **Amazon GSO**: Position relative to category Best Sellers. Mention Prime/FBA context. Compare to price segment within Amazon's ecosystem. Reference what drives 4-5 star ratings in this category. NO invented rankings or fake social proof.`,
+    ebay: `6. **eBay GSO**: Position within auction vs. Buy It Now ecosystem. Reference seller-rating culture. Compare typical price ranges (new vs. used market). Include collectibility/rarity context if applicable.`,
+    etsy: `6. **Etsy GSO**: Position within handmade/vintage ecosystem. Compare to similar makers/artisans. Reference the "Etsy premium" — why buyers pay more (uniqueness, customization, artisan quality). Mention gifting culture.`,
+    walmart: `6. **Walmart GSO**: Position within Walmart's value-tier ecosystem. Compare to Walmart's own brands. Reference family/household shopping context. Mention everyday-use positioning.`,
+    aliexpress: `6. **AliExpress GSO**: Position within global wholesale/value ecosystem. Reference supplier credibility tiers. Compare across price tiers. Include value-for-money vs. local retail alternatives.`,
+    tiktok: `6. **TikTok GSO**: Position within creator-economy and influencer-driven commerce. Reference viral product culture. Compare to similar trending products. Include Gen Z/millennial purchasing context.`,
+    instagram: `6. **Instagram GSO**: Position within lifestyle-brand and creator commerce. Reference "Instagram aesthetic" value. Compare to typical Instagram-native brands. Include influencer-economy price context.`,
+    facebook: `6. **Facebook GSO**: Position within local-first, community-driven commerce. Reference local market dynamics. Compare to typical Marketplace seller types. Include social-commerce context.`,
+    google_shopping: `6. **Google Shopping GSO**: Position for product knowledge panels and comparison shopping. Structure for Shopping Graph inclusion. Compare across multiple retailers (Google aggregates prices).`,
+    pinterest: `6. **Pinterest GSO**: Position within Pinterest's inspiration-to-purchase journey. Reference planning mindset (events, spaces, outfits). Include "save-worthy" attributes. Mention seasonal purchase patterns.`,
     generic: "",
   };
   return instructions[platform] || "";
