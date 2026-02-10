@@ -88,7 +88,13 @@ export default function Home() {
         
         <ProblemGrid>
           <ProblemCard>
-            <ProblemIcon>📸</ProblemIcon>
+            <ProblemIcon>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <path d="M21 15l-5-5L5 21"/>
+              </svg>
+            </ProblemIcon>
             <ProblemTitle>Image generation is broken</ProblemTitle>
             <ProblemText>
               AI tools cram multiple angles into a single image instead of generating 
@@ -97,7 +103,12 @@ export default function Home() {
           </ProblemCard>
           
           <ProblemCard>
-            <ProblemIcon>📝</ProblemIcon>
+            <ProblemIcon>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <path d="M14 2v6h6M16 13H8M16 17H8"/>
+              </svg>
+            </ProblemIcon>
             <ProblemTitle>Marketing copy is fragmented</ProblemTitle>
             <ProblemText>
               Every platform has different SEO rules, character limits, and best practices. 
@@ -106,7 +117,12 @@ export default function Home() {
           </ProblemCard>
           
           <ProblemCard>
-            <ProblemIcon>📁</ProblemIcon>
+            <ProblemIcon>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/>
+                <path d="M13 2v7h7"/>
+              </svg>
+            </ProblemIcon>
             <ProblemTitle>File naming is manual labor</ProblemTitle>
             <ProblemText>
               Generated images come out as image_001.png — sellers manually rename 
@@ -115,7 +131,12 @@ export default function Home() {
           </ProblemCard>
           
           <ProblemCard>
-            <ProblemIcon>🔄</ProblemIcon>
+            <ProblemIcon>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M23 4v6h-6M1 20v-6h6"/>
+                <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+              </svg>
+            </ProblemIcon>
             <ProblemTitle>PIM tools don't solve the root problem</ProblemTitle>
             <ProblemText>
               Product Information Management handles distribution, but can't generate or update 
@@ -123,6 +144,94 @@ export default function Home() {
             </ProblemText>
           </ProblemCard>
         </ProblemGrid>
+      </GallerySection>
+
+      {/* ===== THE SOLUTION — point-by-point ===== */}
+      <SectionWrapper>
+        <SectionHeader>
+          <SectionLabel>The Solution</SectionLabel>
+          <SectionTitle>ImageFlow solves each problem directly</SectionTitle>
+          <SectionSubtitle>
+            Three capabilities unified in one app — no more switching between tools.
+          </SectionSubtitle>
+        </SectionHeader>
+        
+        <SolutionGrid>
+          <SolutionCard>
+            <SolutionBadge>Solves: Image generation is broken</SolutionBadge>
+            <SolutionTitle>Two-Layer AI Image Pipeline</SolutionTitle>
+            <SolutionText>
+              Gemini Flash decomposes your prompt into N separate scene descriptions — understanding 
+              that "different angles" means one angle per image. Then Gemini Pro generates each as 
+              a separate, professional image in parallel. No more angles crammed into one output.
+            </SolutionText>
+          </SolutionCard>
+          
+          <SolutionCard>
+            <SolutionBadge>Solves: Marketing copy is fragmented</SolutionBadge>
+            <SolutionTitle>Platform-Aware Copy Generation</SolutionTitle>
+            <SolutionText>
+              Gemini Flash researches each platform's SEO rules and generates tailored descriptions, 
+              tags, meta titles, and more. Switch between Shopify, Amazon, eBay, and 9 other platforms 
+              with one click. Select any spreadsheet field for AI copy generation — fully customizable.
+            </SolutionText>
+          </SolutionCard>
+          
+          <SolutionCard>
+            <SolutionBadge>Solves: File naming is manual labor</SolutionBadge>
+            <SolutionTitle>Automatic SKU-Based Naming</SolutionTitle>
+            <SolutionText>
+              Configure SKU templates with brand initials, category codes, colors, sizes, and 
+              sequence numbers. When you download, every image is instantly named correctly — 
+              sequence numbers assigned automatically based on download order. Zero manual renaming.
+            </SolutionText>
+          </SolutionCard>
+          
+          <SolutionCard>
+            <SolutionBadge>Solves: PIM tools don't generate content</SolutionBadge>
+            <SolutionTitle>Built-In Catalog Management</SolutionTitle>
+            <SolutionText>
+              Import your product spreadsheets, generate images and copy, save directly back into 
+              the catalog with CDN-hosted image URLs, manage versions, and export — all without 
+              leaving the app. Generation + management in one place, not three separate tools.
+            </SolutionText>
+          </SolutionCard>
+        </SolutionGrid>
+      </SectionWrapper>
+
+      {/* ===== TWO MODES ===== */}
+      <GallerySection>
+        <SectionHeader>
+          <SectionLabel>Two Modes</SectionLabel>
+          <SectionTitle>Flexible workflows for every scenario</SectionTitle>
+          <SectionSubtitle>
+            Choose the mode that fits your task — quick generation or full catalog integration.
+          </SectionSubtitle>
+        </SectionHeader>
+        
+        <ModesGrid>
+          <ModeCard>
+            <ModeLabel>Create Mode</ModeLabel>
+            <ModeTitle>Start from a photo</ModeTitle>
+            <ModeText>
+              Upload any product image, generate professional photos and marketing copy, 
+              then download with automatic SKU naming or save into any spreadsheet. 
+              Spreadsheets in Create mode are write-only — create new products or 
+              update existing ones.
+            </ModeText>
+          </ModeCard>
+          
+          <ModeCard>
+            <ModeLabel>Import Mode</ModeLabel>
+            <ModeTitle>Start from your catalog</ModeTitle>
+            <ModeText>
+              Load a product spreadsheet, browse products visually by SKU, and generate 
+              images and copy in context. Both the original and a different spreadsheet 
+              can serve as source material. Override or transfer images from the original 
+              to a different spreadsheet. Create new products in the target catalog.
+            </ModeText>
+          </ModeCard>
+        </ModesGrid>
       </GallerySection>
 
       {/* ===== HOW IT WORKS ===== */}
@@ -309,7 +418,6 @@ export default function Home() {
               <ImageBox>
                 <ImageLabel>BEFORE</ImageLabel>
                 <ImagePlaceholder>
-                  <PlaceholderIconSmall>📷</PlaceholderIconSmall>
                   <PlaceholderTextSmall>Original Photo</PlaceholderTextSmall>
                 </ImagePlaceholder>
               </ImageBox>
@@ -323,7 +431,6 @@ export default function Home() {
               <ImageBox>
                 <ImageLabel $highlight>AFTER</ImageLabel>
                 <ImagePlaceholder $highlight>
-                  <PlaceholderIconSmall>✨</PlaceholderIconSmall>
                   <PlaceholderTextSmall>AI Generated</PlaceholderTextSmall>
                 </ImagePlaceholder>
               </ImageBox>
@@ -623,8 +730,112 @@ const ProblemCard = styled.div`
 `;
 
 const ProblemIcon = styled.div`
-  font-size: 28px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: ${({ theme }) => theme.colors.accent}15;
+  color: ${({ theme }) => theme.colors.accent};
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 12px;
+`;
+
+/* ============ Solution Section ============ */
+const SolutionGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+  }
+`;
+
+const SolutionCard = styled.div`
+  background: ${({ theme }) => theme.colors.card};
+  border-radius: ${({ theme }) => theme.radius.lg};
+  padding: 28px;
+  border-left: 3px solid ${({ theme }) => theme.colors.accent};
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-4px);
+  }
+`;
+
+const SolutionBadge = styled.div`
+  font-size: 11px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.accent};
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+`;
+
+const SolutionTitle = styled.h3`
+  font-size: 16px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.text};
+  margin: 0 0 8px 0;
+`;
+
+const SolutionText = styled.p`
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.muted};
+  margin: 0;
+  line-height: 1.6;
+`;
+
+/* ============ Modes Section ============ */
+const ModesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  max-width: 900px;
+  margin: 0 auto;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+  }
+`;
+
+const ModeCard = styled.div`
+  background: ${({ theme }) => theme.colors.bg};
+  border-radius: ${({ theme }) => theme.radius.lg};
+  padding: 36px;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-4px);
+  }
+`;
+
+const ModeLabel = styled.div`
+  font-size: 12px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.accent};
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+`;
+
+const ModeTitle = styled.h3`
+  font-size: 20px;
+  font-weight: 800;
+  color: ${({ theme }) => theme.colors.text};
+  margin: 0 0 12px 0;
+`;
+
+const ModeText = styled.p`
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.muted};
+  margin: 0;
+  line-height: 1.7;
 `;
 
 const ProblemTitle = styled.h3`
@@ -886,10 +1097,6 @@ const ImagePlaceholder = styled.div<{ $highlight?: boolean }>`
   justify-content: center;
   gap: 8px;
   border: 2px dashed ${({ $highlight, theme }) => $highlight ? theme.colors.accent : theme.colors.border};
-`;
-
-const PlaceholderIconSmall = styled.div`
-  font-size: 32px;
 `;
 
 const PlaceholderTextSmall = styled.div`
